@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analyzer Pro</title>
+
+    <style>
+        body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+
+        /* 🔥 Apply gradient to whole page */
+        background: linear-gradient(135deg, #eef3f8, #d9e6f2);
+    }
+
+        /* Navbar */
+        .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 60px;
+        background: #1e3a5f;   /* deep blue */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* LOGO */
+    .logo {
+        font-size: 50px;       /* increased */
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 1.5px;
+    }
+
+    /* BUTTONS */
+    .nav-buttons a {
+    text-decoration: none;
+    margin-left: 15px;
+    padding: 10px 22px;   /* increased */
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 25px;      /* slightly bigger */
+    transition: 0.3s;
+}
+
+    /* Login button */
+    .login {
+        background: #3498db;
+        color: white;
+    }
+
+    /* Register button */
+    .register {
+        background: #3498db;
+        color: white;
+    }
+
+    /* Hover */
+    .login:hover {
+        background: white;
+        color: #1e3a5f;
+    }
+
+    .register:hover {
+        background: #2980b9;
+    }
+
+        /* Hero Section */
+    .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 80px;
+
+        /* 🔥 IMPORTANT */
+        gap: 300px;   /* controls spacing */
+    }
+
+        .hero-text {
+        max-width: 500px;
+        margin-left: 100px;   /*  pushes text toward center */
+    }
+
+        .hero-text h1 {
+            font-size: 44px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .hero-text,
+        .hero-image {
+            flex: 1;
+        }
+
+        .highlight {
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .cta {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .cta:hover {
+            background: #2980b9;
+        }
+
+        /* Image */
+        .hero img {
+        width: 450px;       /* increase size */
+        max-width: 100%;
+    }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            color: gray;
+            font-size: 14px;
+        }
+
+        /* Info Section */
+        .info-section {
+            text-align: center;
+            padding: 60px 40px;
+            background: #ffffff;
+        }
+
+        .info-section h2 {
+            font-size: 100px;
+            margin-bottom: 30px;
+        }
+
+        .info-list p {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #555;
+        }
+
+         /* ================= DETAIL + REPORT COMMON FIX ================= */
+        .detail-section,
+        .report-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;   /* 🔥 center whole block */
+            gap: 100px;                /* 🔥 perfect spacing */
+            padding: 100px 120px;      /* balanced padding */
+}
+
+        /* Alternate background for visual separation */
+        .report-section {
+            background: #f8f9fa;
+            gap:60px;
+        }
+
+        /* ================= IMAGE FIX ================= */
+        .detail-image,
+        .report-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .detail-image img,
+        .report-image img {
+            width: 100%;
+            max-width: 450px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Hover effect */
+        .detail-image img:hover,
+        .report-image img:hover {
+            transform: scale(1.03);
+        }
+
+        /* ================= TEXT FIX ================= */
+        .detail-text,
+        .report-text {
+            flex: 1;
+            max-width: 520px;
+        }
+
+        .detail-text h2,
+        .report-text h2 {
+            font-size: 34px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .detail-text p,
+        .report-text p {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 17px;
+        }
+
+        /* ================= REMOVE EXTRA GAP ================= */
+        .detail-section,
+        .report-section {
+            margin: 0;
+        }
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo">Analyzer Pro</div>
+
+    <div class="nav-buttons">
+        <a href="/login" class="login">Login</a>
+        <a href="/register" class="register">Register</a>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<div class="hero">
+
+    <!-- TEXT -->
+    <div class="hero-text">
+        <h1>Smart Business Analysis Platform</h1>
+
+        <p>
+            Analyzer Pro helps businesses manage 
+            <span class="highlight">inventory</span>, track 
+            <span class="highlight">expenses</span>, and generate
+            <span class="highlight">AI-powered forecasts</span> 
+            to make better decisions.
+        </p>
+
+        <p>
+            Upload your data, visualize performance, and gain insights — all in one place.
+        </p>
+
+        <a href="/register" class="cta">Get Started</a>
+    </div>
+
+    <!-- IMAGE -->
+    <div class="hero-image">
+        <img src="{{ url_for('static', filename='main.png') }}" alt="home">
+    </div>
+
+</div>
+
+<div class="info-section">
+    <h1>Why Choose Analyzer Pro?</h1>
+
+    <div class="info-list">
+        <p>✔ Save Time – Automate data analysis in seconds instead of hours.</p>
+        <p>✔ Visual Insights – Generate clean dashboards and reports instantly.</p>
+        <p>✔ Smarter Decisions – Use AI forecasting to predict future trends.</p>
+    </div>
+</div>
+
+<div class="detail-section">
+
+    <div class="detail-image">
+    <img src="{{ url_for('static', filename='insights.png') }}" alt="Insights">
+    </div>
+
+    <div class="detail-text">
+        <h2>Powerful Insights & Forecasts</h2>
+
+        <p>
+            Analyzer Pro transforms raw business data into meaningful insights.
+            With just a few clicks, you can upload your data and generate
+            interactive dashboards.
+        </p>
+
+        <p>
+            Whether it's tracking inventory or forecasting sales,
+            our platform helps you make informed decisions faster.
+        </p>
+
+        <a href="/register" class="cta">Start Now</a>
+    </div>
+
+</div>
+
+<div class="report-section">
+
+    <!-- TEXT FIRST -->
+    <div class="report-text">
+        <h2>Advanced Reports & Insights</h2>
+
+        <p>
+            Generate clean, professional reports with powerful data visualization.
+            Understand trends and business performance at a glance.
+        </p>
+
+        <p>
+            Upload your dataset and get instant results with intuitive charts
+            and AI-driven insights.
+        </p>
+
+        <a href="/register" class="cta">Explore Features</a>
+    </div>
+
+    <!-- IMAGE SECOND (RIGHT SIDE) -->
+    <div class="report-image">
+        <img src="{{ url_for('static', filename='report.png') }}" alt="Reports">
+    </div>
+
+</div>
+
+<!-- Footer (Admin) -->
+<footer>
+    © 2026 Analyzer Pro |
+    <a href="/admin" style="color: gray; text-decoration:none;">Admin</a>
+</footer>
+
+</body>
+</html>
+
+
+

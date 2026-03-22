@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f7fb;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #1e293b;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+/* HEADER */
+.header {
+    padding: 30px;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    gap: 20px;
+    padding: 20px 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    margin: 5px 0;
+}
+
+/* TABLE */
+.table-container {
+    padding: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    background: #f1f5f9;
+}
+
+/* STATUS BADGE */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: white;
+}
+
+.active {
+    background: #22c55e;
+}
+
+.inactive {
+    background: #ef4444;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #b02a37;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2>Admin Panel</h2>
+    <a href="/admin_logout" class="logout-btn">Logout</a>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>Welcome Admin 👑</h1>
+</div>
+
+<!-- STATS -->
+<div class="cards">
+    <div class="card">
+        <h3>Total Users</h3>
+        <h2>{{ total_users }}</h2>
+    </div>
+
+    <div class="card">
+        <h3>Active Users</h3>
+        <h2>{{ active_users }}</h2>
+    </div>
+</div>
+
+<!-- USERS TABLE -->
+<div class="table-container">
+    <h2>All Users</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Last Login</th>
+            <th>Action</th>
+        </tr>
+
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+
+            <td>
+                {% if user.is_active %}
+                    <span class="status active">Active</span>
+                {% else %}
+                    <span class="status inactive">Offline</span>
+                {% endif %}
+            </td>
+
+            <td>
+                {{ user.last_login if user.last_login else "N/A" }}
+            </td>
+
+            <td>
+                <form action="/delete_user/{{ user.id }}" method="POST">
+                    <button class="delete-btn">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<!-- CHANGE PASSWORD SECTION -->
+<div style="margin: 40px 30px; background:white; padding:20px; border-radius:10px;">
+    <h3>🔐 Change Admin Password</h3>
+
+    <form method="POST" action="/admin_change_password">
+        <input type="password" name="old_password" placeholder="Old Password" required
+               style="padding:10px; margin:10px; width:200px;">
+
+        <input type="password" name="new_password" placeholder="New Password" required
+               style="padding:10px; margin:10px; width:200px;">
+
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required
+               style="padding:10px; margin:10px; width:200px;">
+
+        <button type="submit" style="
+            padding:10px 15px;
+            background:#2563eb;
+            color:white;
+            border:none;
+            border-radius:5px;
+        ">
+            Update Password
+        </button>
+    </form>
+
+    {% if success %}
+        <p style="color:green;">{{ success }}</p>
+    {% endif %}
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

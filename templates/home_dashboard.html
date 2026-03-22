@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e3edf7, #c9d6e3);
+}
+
+/* NAVBAR */
+.navbar {
+    background: #243f63;
+    color: white;
+    padding: 20px 40px;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* RIGHT SIDE */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* DARK BUTTON */
+.dark-btn {
+    background: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ADMIN BUTTON */
+.admin-btn {
+    background: #3498db;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.admin-btn:hover {
+    background: #217dbb;
+}
+
+/* PROFILE */
+.profile-container {
+    position: relative;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    background: #3498db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* DROPDOWN */
+.profile-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: white;
+    border-radius: 8px;
+    width: 140px;              /* ⬇ smaller width */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    overflow: hidden;
+    padding: 5px 0;
+}
+
+/* NAME */
+.profile-name {
+    padding: 10px;
+    font-size: 14px;          /* ⬅ same as links */
+    font-weight: 500;         /* ⬅ not too bold */
+    color: #333;              /* 🔥 FIX: visible text */
+    background: transparent;  /* 🔥 remove grey bg */
+    text-align: center;
+    border-bottom: 1.5px solid #d1d5db;
+}
+
+/* LINKS */
+.profile-menu a {
+    display: block;
+    padding: 8px 10px;        /* ⬇ smaller spacing */
+    font-size: 14px;          /* ⬅ same as name */
+    text-decoration: none;
+    color: #333;
+    text-align: center;
+}
+
+/* HOVER */
+.profile-menu a:hover {
+    background: #f1f1f1;
+    color: #007bff;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    padding: 60px 20px 30px;
+}
+
+.header h1 {
+    font-size: 38px;
+    color: #2c3e50;
+}
+
+.header p {
+    color: #555;
+}
+
+/* CARDS */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    width: 280px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+}
+
+.feature-card h3 {
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #666;
+}
+
+/* BUTTON */
+.card-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.card-btn:hover {
+    background: #217dbb;
+}
+
+/* 🌙 DARK MODE */
+.dark-mode {
+    background: linear-gradient(135deg, #0f172a, #1e293b);  /* better depth */
+    color: #f1f5f9;
+}
+
+/* NAVBAR */
+.dark-mode .navbar {
+    background: #020617;
+}
+
+/* 🔥 CARD FIX (IMPORTANT) */
+.dark-mode .feature-card {
+    background: #1e293b;              /* slightly lighter than bg */
+    color: #f1f5f9;
+    border: 1px solid #334155;        /* gives separation */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+}
+
+/* CARD TEXT */
+.dark-mode .feature-card p {
+    color: #94a3b8;   /* softer grey for readability */
+}
+
+/* HEADER TEXT */
+.dark-mode .header h1 {
+    color: #ffffff;
+}
+
+.dark-mode .header p {
+    color: #cbd5e1;
+}
+
+/* BUTTON */
+.dark-mode .card-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.dark-mode .card-btn:hover {
+    background: #2563eb;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div>Analyzer Pro</div>
+
+    <div class="nav-right">
+        
+        <button onclick="toggleDarkMode()" class="dark-btn" id="themeBtn">🌙</button>
+        <a href="/admin_login" class="admin-btn">Admin</a>
+
+        <div class="profile-container">
+            <div class="profile-icon" onclick="toggleMenu()">
+                {{ name[0] }}
+            </div>
+
+            <div class="profile-menu" id="profileMenu">
+                <p class="profile-name">{{ name }}</p>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>Welcome, {{ name }} 👋</h1>
+    <p>Choose what you want to explore</p>
+</div>
+
+<!-- CARDS -->
+<div class="cards-container">
+
+    <div class="feature-card">
+        <h3>📦 Inventory</h3>
+        <p>Manage and track your stock efficiently.</p>
+        <a href="/inventory" class="card-btn">Open</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>📊 Dashboard</h3>
+        <p>View analytics and performance insights.</p>
+        <a href="/dashboard" class="card-btn">Open</a>
+    </div>
+
+    <div class="feature-card">
+        <h3>🤖 AI Forecast</h3>
+        <p>Predict future trends using AI.</p>
+        <a href="/forecast" class="card-btn">Open</a>
+    </div>
+
+     <!-- 💸 EXPENSES (NEW CARD) -->
+    <div class="feature-card">
+        <h3>💸 Expenses</h3>
+        <p>Track and analyze your business expenses.</p>
+        <a href="/expense" class="card-btn">Open</a>
+    </div>
+
+</div>
+
+<!-- JS -->
+<script>
+function toggleMenu() {
+    var menu = document.getElementById("profileMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+document.addEventListener("click", function(event) {
+    var profile = document.querySelector(".profile-container");
+    var menu = document.getElementById("profileMenu");
+
+    if (!profile.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
+
+/* 🌙 DARK MODE TOGGLE (FIXED) */
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+
+    updateIcon();
+}
+
+/* 🔁 APPLY THEME ON PAGE LOAD */
+window.onload = function() {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+    updateIcon();
+};
+
+/* 🔄 ICON CHANGE */
+function updateIcon() {
+    let btn = document.querySelector(".dark-btn");
+
+    if (document.body.classList.contains("dark-mode")) {
+        btn.innerHTML = "☀️";
+    } else {
+        btn.innerHTML = "🌙";
+    }
+}
+</script>
+
+</body>
+</html>

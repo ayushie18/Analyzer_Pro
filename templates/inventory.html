@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<title>Inventory Management</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+
+
+</head>
+
+<body class="inventory-page">
+
+<div class="container">
+
+<div class="header">
+<h1>Warehouse Inventory Management</h1>
+<p>Track stock levels and manage warehouse inventory</p>
+</div>
+
+<div class="summary-row">
+
+<div class="summary-card blue-card">
+<span>Total Products</span>
+<div class="card-value">{{ total_products }}</div>
+</div>
+
+<div class="summary-card green-card">
+<span>Total Stock</span>
+<div class="card-value">{{ total_stock }}</div>
+</div>
+
+<div class="summary-card red-card">
+<span>Low Stock Items</span>
+<div class="card-value">{{ low_stock }}</div>
+</div>
+</div>
+<h3 style="margin-top:30px;">Inventory Stock Overview</h3>
+
+<div id="inventory-chart" style="height:400px;"></div>
+
+
+
+
+<!-- Upload Inventory -->
+<h3 class="section-title">Upload Warehouse Data</h3>
+
+<div class="glass-panel green-dash">
+
+<p style="font-size:0.9em;color:#666">
+Upload warehouse CSV to update current stock levels
+</p>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input type="hidden" name="form_type" value="warehouse">
+
+<input type="file" name="inventory_file"
+accept=".csv,.xlsx,.xls"
+required
+style="margin:10px 0">
+
+<br>
+
+<button type="submit" class="btn btn-save">
+Update Inventory
+</button>
+
+</form>
+
+</div>
+<h3 class="section-title">Manual Inventory Entry</h3>
+
+<div class="glass-panel">
+
+<form action="/add_inventory" method="POST"
+style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+
+<input type="text"
+name="product_name"
+placeholder="Product Name"
+required>
+
+<input type="number"
+name="quantity"
+placeholder="Quantity"
+required>
+
+<button type="submit" class="btn btn-save">
+Add / Update Stock
+</button>
+
+</form>
+
+</div>
+
+
+<!-- Reset Stock -->
+
+<div class="glass-panel">
+
+<form action="/reset_warehouse"
+method="POST"
+onsubmit="return confirm('Clear all warehouse stock?');">
+
+<button type="submit" class="btn btn-reset">
+🗑 Reset Warehouse Stock
+</button>
+
+</form>
+
+<form method="GET" action="/inventory" style="margin:20px 0;">
+    
+<input 
+type="text" 
+name="search" 
+placeholder="Search product..." 
+value="{{ request.args.get('search','') }}"
+style="
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+width:250px;
+">
+
+<button type="submit" class="btn btn-save">
+Search
+</button>
+
+</form>
+
+
+
+<!-- Inventory Movement Tracking -->
+
+<h3 class="section-title">Inventory Movement Tracking</h3>
+
+<div class="inventory-grid">
+
+{% for item in inventory_data %}
+
+<div class="inventory-item"
+style="border-top:4px solid
+{% if item.warehouse_stock < 5 %}
+var(--danger)
+{% elif item.warehouse_stock < 20 %}
+orange
+{% else %}
+var(--success)
+{% endif %}
+">
+
+<div style="display:flex;justify-content:space-between">
+
+<strong style="color:var(--primary)">
+{{ item.product }}
+</strong>
+
+{% if item.is_low %}
+<span style="background:#ffebee;
+color:var(--danger);
+font-size:11px;
+padding:3px 6px;
+border-radius:4px">
+LOW STOCK
+</span>
+{% endif %}
+
+</div>
+
+<p style="margin:10px 0 5px;font-size:0.9em;color:#666">
+
+Warehouse Stock:
+<b>{{ item.warehouse_stock }}</b>
+
+</p>
+
+
+<div class="progress-container">
+
+<div class="progress-bar"
+
+style="width:
+{{ (item.warehouse_stock/50)*100 if item.warehouse_stock < 50 else 100 }}%;
+
+background:
+{% if item.warehouse_stock < 5 %}
+var(--danger)
+{% elif item.warehouse_stock < 20 %}
+orange
+{% else %}
+var(--success)
+{% endif %}
+">
+
+</div>
+
+</div>
+
+
+<div style="display:flex;
+justify-content:space-between;
+margin-top:10px;
+font-size:0.8em;
+color:#888">
+
+<span>Sold: {{ item.total_sold }}</span>
+
+<span>Last Sale: {{ item.days_since_sale }}d ago</span>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- Back Button -->
+
+<div style="margin-top:40px;text-align:center">
+
+<a href="/home_dashboard" class="back-link">
+⬅ Back to Home
+</a>
+
+</div>
+
+
+</div>
+
+<script>
+
+{% if inventory_chart_json %}
+
+var inventoryChart = {{ inventory_chart_json | safe }};
+
+Plotly.newPlot(
+    "inventory-chart",
+    inventoryChart.data,
+    inventoryChart.layout
+);
+
+{% endif %}
+
+</script>
+
+</body>
+</html>

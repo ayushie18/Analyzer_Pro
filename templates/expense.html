@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense - Business Analyzer</title>
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 40px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #38bdf8; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <h1>Expenses</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div style="
+            background:#d4edda;
+            color:#155724;
+            padding:10px;
+            border-radius:6px;
+            margin-bottom:15px;
+        ">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <form action="/save_expense" method="POST">
+            <label>Category</label>
+            <select name="category" id="category" onchange="toggleOtherCategory()">
+            <option value="Rent">Rent</option>
+            <option value="Salaries">Salaries</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Inventory">Inventory</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <input type="text" name="other_category" id="other_category" 
+            placeholder="Enter custom category"
+            style="display:none; margin-top:10px;">
+            <label>Amount (₹)</label>
+            <input type="number" name="amount" placeholder="Enter amount" required>
+            <button type="submit">Save Expense</button>
+                </form>
+        <hr style="margin:25px 0;">
+
+        <h3>📂 Upload Expense CSV</h3>
+
+        <form action="/upload_expense_csv" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit" style="margin-top:10px; background:#28a745;">
+                Upload CSV
+            </button>
+        </form>
+        <div style="display:flex; gap:20px; margin-top:20px;">
+
+        <div style="
+            flex:1;
+            background:linear-gradient(135deg,#dc3545,#a71d2a);
+            color:white;
+            padding:20px;
+            border-radius:10px;
+            text-align:center;
+        ">
+            <div style="font-size:14px;">Total Expenses</div>
+            <div style="font-size:24px; font-weight:bold;">
+                ₹{{ total_expense }}
+            </div>
+        </div>
+
+        <div style="
+            flex:1;
+            background:linear-gradient(135deg,#ff9800,#e65100);
+            color:white;
+            padding:20px;
+            border-radius:10px;
+            text-align:center;
+        ">
+            <div style="font-size:14px;">Highest Expense Category</div>
+            <div style="font-size:24px; font-weight:bold;">
+                {{ top_expense.category if top_expense else 'N/A' }}
+            </div>
+        </div>
+
+</div>
+
+
+
+
+
+            <div id="expense-sunburst-container" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: {% if expense_json %}block{% else %}none{% endif %};">
+        <h3 style="text-align: center; color: #333;">Expense Distribution</h3>
+        <div id="expense-sunburst" style="height: 450px; width: 100%;"></div>
+    </div>
+
+        <script>
+    function toggleOtherCategory(){
+        var category = document.getElementById("category").value;
+        var otherBox = document.getElementById("other_category");
+
+        if(category === "Other"){
+            otherBox.style.display = "block";
+        } else {
+            otherBox.style.display = "none";
+        }
+    }
+    </script>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <h3 style="margin-top:40px;">Monthly Expense Trend</h3>
+
+    <div id="monthly-expense-chart" style="height:400px;"></div>
+
+    
+    <h3 style="margin-top:30px;">Recent Expenses</h3>
+    <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+    <tr style="background:#f8f9fa;">
+    <th style="padding:12px; text-align:left;">Category</th>
+    <th style="padding:12px; text-align:left;">Amount</th>
+    <th style="padding:12px; text-align:center;">Action</th>
+    </tr>
+
+    {% for e in expense_list %}
+    <tr style="border-bottom:1px solid #eee;">
+    <td style="padding:10px;">{{ e.category }}</td>
+
+    <td style="padding:10px;">
+    ₹{{ "{:,.0f}".format(e.amount) }}
+    </td>
+
+    <td style="padding:10px; text-align:center;">
+    <a href="/delete_expense/{{ e.id }}"
+    onclick="return confirm('Delete this expense?')"
+    style="color:#dc3545; font-size:18px;">
+    🗑
+    </a>
+    </td>
+
+    </tr>
+    {% endfor %}
+
+    </table>
+
+     <div>
+    <a href="/home_dashboard" class="btn-back">← Back to home</a>
+     </div>
+
+
+    <script>
+        // Only render if data is sent from the backend
+        {% if expense_json %}
+            var expData = {{ expense_json | safe }};
+            var layout = {
+                margin: {t: 0, l: 0, r: 0, b: 0},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)'
+            };
+            Plotly.newPlot('expense-sunburst', expData.data, expData.layout, {displaylogo: false, responsive: true});
+        {% endif %}
+    </script>
+            <script>
+
+        {% if monthly_expense_json %}
+        var monthChart = {{ monthly_expense_json | safe }};
+
+        Plotly.newPlot(
+            "monthly-expense-chart",
+            monthChart.data,
+            monthChart.layout
+        );
+        {% endif %}
+
+        </script>
+    </div>
+</body>
+</html>

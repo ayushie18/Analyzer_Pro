@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Analyzer (₹)</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+</head>
+<body class="dashboard-page">
+
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div style="padding: 15px; background-color: #d1ecf1; color: #0c5460; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="main-header">
+        <h1>Welcome to the Business and Sales Analyzer</h1>
+        <p>Hello, <b>{{ name }}</b>! Monitor your profits and inventory movement in real-time.</p>
+    </div>
+  
+
+    <div class="summary-row">
+        <div class="summary-card sales-card">
+            <span>Lifetime Sales</span>
+            <div class="card-value">₹{{ summary.sales }}</div>
+        </div>
+        <div class="summary-card" style="background: linear-gradient(135deg, #6610f2, #4b0db8);">
+            <span>Today's Profit</span>
+            <div class="card-value">₹{{ daily_total }}</div>
+        </div>
+        <div class="summary-card profit-card">
+            <span>Total Profit</span>
+            <div class="card-value">₹{{ summary.profit }}</div>
+        </div>
+      
+      <div class="summary-card" style="background: linear-gradient(135deg,#17a2b8,#0f6674);">
+        <span>📉 Profit Margin</span>
+        <div class="card-value">{{ profit_margin }}%</div>
+        </div>
+
+        <div class="summary-card" style="background: linear-gradient(135deg,#ff9800,#e65100);">
+        <span>🔥 Best Product</span>
+        <div class="card-value">{{ best_product }}</div>
+        </div>
+
+    </div>
+
+    <div class="actions-row">
+       <form action="/reset_inventory" method="POST" onsubmit="return confirm('Clear all manual sales data?');">
+        <button type="submit" class="btn btn-reset">🗑️ Reset Sales Data</button>
+    </form>
+     
+        <div class="report-dropdown">
+    <button class="report-btn">📊 Download Analysis Report ▾</button>
+
+    <div class="dropdown-content">
+        <a href="/download_excel">📗 Download Excel</a>
+        <a href="/download_pdf">📕 Download PDF</a>
+        <a href="/download_csv">📄 Download CSV</a>
+    </div>
+   </div>
+   </div>
+
+    
+  
+
+    <div class="glass-panel">
+        <h3 style="margin-top:0;">Manual Daily Entry (₹)</h3>
+        <form action="/add_sale" method="POST" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+            <input type="text" name="product" placeholder="Item Name" required>
+            <input type="number" name="quantity" placeholder="Qty" required>
+            <input type="number" name="selling_price" placeholder="Sale Price (₹)" required>
+            <input type="number" name="cost_price" placeholder="Cost Price (₹)" required>
+            <button type="submit" class="btn btn-save">Save Sale</button>
+        </form>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        <div class="glass-panel blue-dash" style="margin-bottom: 0;">
+            <h3 style="margin-top:0; color: var(--primary);">📈 Sales Analysis</h3>
+            <p style="font-size: 0.9em; color: #666;">Upload Sales CSV for Automatic Analysis.</p>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="form_type" value="sales">
+                <input type="file" name="sales_file" accept=".csv, .xlsx, .xls" required style="max-width: 100%;">
+                <button type="submit" class="btn btn-save full-width-btn">
+    Analyze File
+</button>
+            </form>
+        </div>
+
+       
+    </div>
+
+    {% if bar_json or pie_json or line_json or stock_pie_json or forecast_json %}
+    <h3 class="section-title">Visual Performance Analysis</h3>
+    <div class="glass-panel" style="display: flex; flex-direction: column; gap: 40px; align-items: center;">
+        
+        {% if bar_json %}
+        <div class="chart-container" style="width: 100%; max-width: 900px;">
+            <div id="bar-chart" style="height: 500px;"></div>
+        </div>
+        <hr style="width: 100%; border: 0; border-top: 1px solid #eee; margin: 0;">
+        {% endif %}
+        
+        <div class="chart-row">
+            {% if pie_json %}
+            <div class="chart-box">
+                <div id="pie-chart" style="height: 450px;"></div>
+            </div>
+            {% endif %}
+
+            {% if stock_pie_json %}
+            <div class="chart-box">
+                <div id="stock-donut-chart" style="height: 450px;"></div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if line_json %}
+        <hr style="width: 100%; border: 0; border-top: 1px solid #eee; margin: 0;">
+        <div class="chart-container" style="width: 100%; max-width: 900px;">
+            <div id="line-chart" style="height: 500px;"></div>
+        </div>
+        {% endif %}
+
+        {% if forecast_json %}
+        <hr style="width: 100%; border: 0; border-top: 1px solid #eee; margin: 0;">
+        <div class="chart-container" style="width: 100%; max-width: 900px;">
+            <div id="ai-forecast" style="height: 500px;"></div>
+        </div>
+        {% endif %}
+
+
+    </div>
+    {% endif %}    
+      
+    
+
+    
+
+    <h3 class="section-title">Business Statistical Overview</h3>
+    <div class="glass-panel" style="display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div>
+                <p style="color: #666; margin-bottom: 5px;">Average Transaction</p>
+                <h2 style="color: var(--primary);">₹{{ stats.avg_sale | default(0) }}</h2>
+            </div>
+            <div style="border-left: 1px solid #eee; padding-left: 20px;">
+                <p style="color: #666; margin-bottom: 5px;">Highest Transaction</p>
+                <h2 style="color: var(--success);">₹{{ stats.max_sale | default(0) }}</h2>
+            </div>
+            <div style="border-left: 1px solid #eee; padding-left: 20px;">
+                <p style="color: #666; margin-bottom: 5px;">Total Transactions</p>
+                <h2 style="color: #333;">{{ stats.count | default(0) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; text-align: center;">
+        <a href="/logout" style="text-decoration: none; color: var(--danger); font-weight: bold;">Logout</a>
+    </div>
+</div>
+
+<script>
+    const myConfig = { 
+        displaylogo: false, 
+        responsive: true,
+        modeBarButtons: [['toImage', 'zoomIn2d', 'zoomOut2d', 'hoverClosestCartesian']] 
+    };
+
+    // Plot logic wrapped in safe checks
+    {% if bar_json %} 
+        var barData = {{ bar_json | safe }};
+        Plotly.newPlot('bar-chart', barData.data, barData.layout, myConfig); 
+    {% endif %}
+
+    {% if pie_json %} 
+        var pieData = {{ pie_json | safe }};
+        Plotly.newPlot('pie-chart', pieData.data, pieData.layout, myConfig); 
+    {% endif %}
+
+    {% if stock_pie_json %} 
+        var stockData = {{ stock_pie_json | safe }};
+        Plotly.newPlot('stock-donut-chart', stockData.data, stockData.layout, myConfig); 
+    {% endif %}
+
+    {% if line_json %} 
+        var lineData = {{ line_json | safe }};
+        Plotly.newPlot('line-chart', lineData.data, lineData.layout, myConfig); 
+    {% endif %}
+
+    {% if forecast_json %} 
+        var forecastData = {{ forecast_json | safe }};
+        Plotly.newPlot('ai-forecast', forecastData.data, forecastData.layout, myConfig); 
+    {% endif %}
+
+    // Sunburst chart logic for Expense Breakdown
+    {% if expense_json %} 
+        var expData = {{ expense_json | safe }};
+        Plotly.newPlot('expense-sunburst', expData.data, expData.layout, myConfig); 
+    {% endif %}
+</script>
+
+<script>
+function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// close when clicking outside
+window.onclick = function(event) {
+    if (!event.target.matches('button')) {
+        const dropdown = document.getElementById("dropdownMenu");
+        if (dropdown) dropdown.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>

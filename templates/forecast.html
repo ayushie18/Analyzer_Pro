@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Forecast - Business Analyzer</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="forecast-page">
+
+<div class="forecast-container">
+
+    <!-- BACK BUTTON -->
+    <a href="{{ url_for('home_dashboard') }}" class="btn-back">← Back to Home</a>
+
+    <!-- TITLE -->
+    <h1>AI Forecasting</h1>
+
+    <!-- 🔥 SUMMARY CARDS -->
+    <div class="forecast-cards">
+
+        <div class="forecast-card">
+            <h4>📅 Daily Avg</h4>
+            <p>₹{{ daily_avg }}</p>
+        </div>
+
+        <div class="forecast-card">
+            <h4>📊 Weekly</h4>
+            <p>₹{{ total_week_pred }}</p>
+        </div>
+
+        <div class="forecast-card">
+            <h4>📆 Monthly</h4>
+            <p>₹{{ total_month_pred }}</p>
+        </div>
+
+    </div>
+
+    <!-- MAIN PREDICTION -->
+    <div class="pred-box">
+        <h2>Next Estimated Revenue: ₹{{ next_pred }}</h2>
+    </div>
+
+    <!-- 🔥 TREND + AI INSIGHT -->
+    <div class="insight-box">
+        <h3>{{ trend_text }}</h3>
+        <p>{{ insight }}</p>
+    </div>
+
+ 
+
+    <h3 class="section-title">🔥 Trending Products</h3>
+
+    <div class="trending-grid">
+        {% for item in trending_products %}
+        
+        <div class="trend-card">
+            <h4>{{ item.name }}</h4>
+            
+            <p class="trend-current">
+                Current: ₹{{ item.current }}
+            </p>
+            
+            <p class="trend-next">
+                Next: ₹{{ item.predicted }}
+            </p>
+
+        {% if item.growth > 0 %}
+            <span class="trend-badge up">📈 Growth</span>
+        {% elif item.growth < 0 %}
+            <span class="trend-badge down">📉 Decline</span>
+        {% else %}
+            <span class="trend-badge neutral">➖ Stable</span>
+        {% endif %}
+        </div>
+
+        {% endfor %}
+    </div>
+
+
+    <!-- GRAPH -->
+    <div id="forecast-chart" style="height: 500px; width: 100%;"></div>
+
+    <!-- SUMMARY -->
+    <div class="summary-section">
+        <h3>30-Day Total Predicted Revenue: ₹{{ total_month_pred }}</h3>
+        <h3 style="color:#006064;">Weekly Total: ₹{{ total_week_pred }}</h3>
+    </div>
+
+    <!-- TABLE -->
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Predicted Revenue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in weekly_forecast %}
+            <tr>
+                <td>{{ item.date }}</td>
+                <td>{{ item.day }}</td>
+                <td class="revenue-cell">₹{{ item.revenue }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+
+<script>
+var rawData = {{ forecast_json | safe }};
+
+if (rawData && rawData.data) {
+    var config = { responsive: true, displaylogo: false };
+    Plotly.newPlot('forecast-chart', rawData.data, rawData.layout, config);
+} else {
+    document.getElementById('forecast-chart').innerHTML =
+        "<p style='text-align:center; padding-top:100px;'>Insufficient data for forecasting.</p>";
+}
+</script>
+
+</body>
+</html>
