@@ -1,14 +1,16 @@
+import os
 import mysql.connector
 
 def get_connection():
     try:
-        return mysql.connector.connect(
-             host="host.docker.internal",
-            user="root",
-            password="Mysql@ayu04",
-            database="project",
-            
+        conn = mysql.connector.connect(
+            host=os.getenv("MYSQLHOST"),
+            user=os.getenv("MYSQLUSER"),
+            password=os.getenv("MYSQLPASSWORD"),
+            database=os.getenv("MYSQLDATABASE"),
+            port=int(os.getenv("MYSQLPORT"))
         )
+        return conn
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Database Error: {e}")
         return None
