@@ -20,53 +20,62 @@ app = Flask(__name__)
 app.secret_key = "secret_key"
 
 conn = get_connection()
-cursor = conn.cursor()
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS admin (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100),
-    password VARCHAR(255)
-)""")
+if conn:
+    cursor = conn.cursor()
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100),
-    password VARCHAR(255),
-    last_login DATETIME,
-    is_active TINYINT(1)
-)""")
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS expenses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    category VARCHAR(100),
-    amount DECIMAL(10,2),
-    expense_date DATE
-)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS admin (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100),
+        password VARCHAR(255)
+    )""")
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS inventory (
-    product_name VARCHAR(255) PRIMARY KEY,
-    current_stock INT,
-    min_threshold INT
-)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(100),
+        password VARCHAR(255),
+        last_login DATETIME,
+        is_active TINYINT(1)
+    )""")
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS manual_sales (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    product VARCHAR(255),
-    quantity INT,
-    remaining_stock INT,
-    amount DECIMAL(10,2),
-    cost_price DECIMAL(10,2),
-    profit DECIMAL(10,2),
-    sale_date DATE
-)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS expenses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        category VARCHAR(100),
+        amount DECIMAL(10,2),
+        expense_date DATE
+    )""")
 
-conn.commit()
-conn.close()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS inventory (
+        product_name VARCHAR(255) PRIMARY KEY,
+        current_stock INT,
+        min_threshold INT
+    )""")
+
+    cursor.execute("""CREATE TABLE IF NOT EXISTS manual_sales (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        product VARCHAR(255),
+        quantity INT,
+        remaining_stock INT,
+        amount DECIMAL(10,2),
+        cost_price DECIMAL(10,2),
+        profit DECIMAL(10,2),
+        sale_date DATE
+    )""")
+
+    conn.commit()
+    conn.close()
+else:
+    print("Skipping table creation - DB not connected")
 
 def get_business_report_data():
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+    else:
+        cursor = None
 
     # total sales
     cursor.execute("SELECT SUM(amount) as total_sales FROM manual_sales")
